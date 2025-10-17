@@ -6,7 +6,7 @@ import seaborn as sns
 import numpy as np
 
 def load_final_results():
-    """加载最终标准化实验的结果"""
+    """Load final standardized experiment results"""
     results = {}
     
     experiments = [
@@ -21,16 +21,16 @@ def load_final_results():
         if os.path.exists(path):
             with open(path, 'r') as f:
                 results[exp] = json.load(f)
-                print(f"✓ 加载: {exp}")
+                print(f"✓ Loaded: {exp}")
     
     return results
 
 def create_comparison_table(results):
-    """创建详细对比表格"""
+    """Create detailed comparison table"""
     data = []
     
     for name, result in results.items():
-        # 判断是否是LoRA
+        # Determine if it's LoRA
         is_lora = 'lora' in name.lower()
         rank = result['lora_config']['r'] if is_lora else 'Full'
         
@@ -53,7 +53,7 @@ def create_comparison_table(results):
     return df.sort_values('Accuracy', ascending=False)
 
 def plot_performance_comparison(df):
-    """图1: 性能对比"""
+    """Plot 1: Performance comparison"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(12, 6))
     
@@ -76,7 +76,7 @@ def plot_performance_comparison(df):
     ax.set_ylim([0.80, 0.88])
     ax.grid(axis='y', alpha=0.3)
     
-    # 标注数值
+    # Annotate values
     for i, (acc, f1) in enumerate(zip(df['Accuracy'], df['F1 Score'])):
         ax.text(i - width, acc + 0.002, f'{acc:.4f}', 
                 ha='center', va='bottom', fontsize=8, fontweight='bold')
@@ -86,10 +86,10 @@ def plot_performance_comparison(df):
     plt.tight_layout()
     plt.savefig('plots/1_performance_comparison.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图1已保存: plots/1_performance_comparison.png")
+    print("✓ Plot 1 saved: plots/1_performance_comparison.png")
 
 def plot_lora_rank_impact(df):
-    """图2: LoRA Rank影响"""
+    """Plot 2: LoRA Rank impact"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -104,7 +104,7 @@ def plot_lora_rank_impact(df):
             marker='s', linewidth=2.5, markersize=12, label='F1 Score',
             color='#e74c3c')
     
-    # 添加Full的水平线作为基准
+    # Add Full fine-tuning baseline
     full_acc = df[df['Type'] == 'Full Fine-tuning']['Accuracy'].values[0]
     full_f1 = df[df['Type'] == 'Full Fine-tuning']['F1 Score'].values[0]
     ax.axhline(y=full_acc, color='#3498db', linestyle='--', 
@@ -122,10 +122,10 @@ def plot_lora_rank_impact(df):
     plt.tight_layout()
     plt.savefig('plots/2_lora_rank_impact.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图2已保存: plots/2_lora_rank_impact.png")
+    print("✓ Plot 2 saved: plots/2_lora_rank_impact.png")
 
 def plot_parameter_comparison(df):
-    """图3: 参数量对比"""
+    """Plot 3: Parameter comparison"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -147,10 +147,10 @@ def plot_parameter_comparison(df):
     plt.tight_layout()
     plt.savefig('plots/3_parameter_comparison.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图3已保存: plots/3_parameter_comparison.png")
+    print("✓ Plot 3 saved: plots/3_parameter_comparison.png")
 
 def plot_training_time(df):
-    """图4: 训练时间对比"""
+    """Plot 4: Training time comparison"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -173,10 +173,10 @@ def plot_training_time(df):
     plt.tight_layout()
     plt.savefig('plots/4_training_time.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图4已保存: plots/4_training_time.png")
+    print("✓ Plot 4 saved: plots/4_training_time.png")
 
 def plot_parameter_efficiency(df):
-    """图5: 参数效率"""
+    """Plot 5: Parameter efficiency"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -201,10 +201,10 @@ def plot_parameter_efficiency(df):
     plt.tight_layout()
     plt.savefig('plots/5_parameter_efficiency.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图5已保存: plots/5_parameter_efficiency.png")
+    print("✓ Plot 5 saved: plots/5_parameter_efficiency.png")
 
 def plot_accuracy_vs_parameters(df):
-    """图6: 准确率vs参数量散点图"""
+    """Plot 6: Accuracy vs parameters scatter plot"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 8))
     
@@ -231,14 +231,14 @@ def plot_accuracy_vs_parameters(df):
     plt.tight_layout()
     plt.savefig('plots/6_accuracy_vs_parameters.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图6已保存: plots/6_accuracy_vs_parameters.png")
+    print("✓ Plot 6 saved: plots/6_accuracy_vs_parameters.png")
 
 def plot_metrics_heatmap(df):
-    """图7: 指标热力图"""
+    """Plot 7: Metrics heatmap"""
     sns.set_style("white")
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # 选择关键指标
+    # Select key metrics
     heatmap_data = df[['Method', 'Accuracy', 'F1 Score', 'Precision', 'Recall']].set_index('Method')
     
     sns.heatmap(heatmap_data.T, annot=True, fmt='.4f', cmap='RdYlGn', 
@@ -252,10 +252,10 @@ def plot_metrics_heatmap(df):
     plt.tight_layout()
     plt.savefig('plots/7_metrics_heatmap.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图7已保存: plots/7_metrics_heatmap.png")
+    print("✓ Plot 7 saved: plots/7_metrics_heatmap.png")
 
 def plot_full_vs_best_lora(df):
-    """图8: Full vs 最佳LoRA对比"""
+    """Plot 8: Full vs best LoRA comparison"""
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -280,7 +280,7 @@ def plot_full_vs_best_lora(df):
         bars2 = ax.bar(x + width/2, lora_scores, width, label=f'Best LoRA (r={best_lora["LoRA Rank"]})', 
                       alpha=0.8, color='#4ecdc4', edgecolor='black', linewidth=1.5)
         
-        # 添加数值标签
+        # Add value labels
         for bars in [bars1, bars2]:
             for bar in bars:
                 height = bar.get_height()
@@ -299,95 +299,95 @@ def plot_full_vs_best_lora(df):
     plt.tight_layout()
     plt.savefig('plots/8_full_vs_best_lora.png', dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ 图8已保存: plots/8_full_vs_best_lora.png")
+    print("✓ Plot 8 saved: plots/8_full_vs_best_lora.png")
 
 def print_insights(df):
-    """打印关键洞察"""
+    """Print key insights"""
     print("\n" + "="*70)
-    print("🔍 关键发现与洞察")
+    print("🔍 Key Findings and Insights")
     print("="*70)
     
     best = df.iloc[0]
-    print(f"\n🏆 最佳模型: {best['Method']}")
-    print(f"   ├─ 准确率: {best['Accuracy']:.4f} ({best['Accuracy']*100:.2f}%)")
-    print(f"   ├─ F1分数: {best['F1 Score']:.4f}")
-    print(f"   ├─ 可训练参数: {best['Trainable Params (M)']:.2f}M ({best['Trainable %']:.2f}%)")
-    print(f"   └─ 训练时间: {best['Training Time (min)']:.2f} 分钟")
+    print(f"\n🏆 Best Model: {best['Method']}")
+    print(f"   ├─ Accuracy: {best['Accuracy']:.4f} ({best['Accuracy']*100:.2f}%)")
+    print(f"   ├─ F1 Score: {best['F1 Score']:.4f}")
+    print(f"   ├─ Trainable Parameters: {best['Trainable Params (M)']:.2f}M ({best['Trainable %']:.2f}%)")
+    print(f"   └─ Training Time: {best['Training Time (min)']:.2f} minutes")
     
-    # LoRA vs Full对比
+    # LoRA vs Full comparison
     lora_best = df[df['Type'] == 'LoRA'].iloc[0]
     full = df[df['Type'] == 'Full Fine-tuning'].iloc[0]
     
     acc_diff = (lora_best['Accuracy'] - full['Accuracy']) * 100
     param_reduction = (1 - lora_best['Trainable Params (M)'] / full['Trainable Params (M)']) * 100
     
-    print(f"\n⚡ 最佳LoRA vs Full Fine-tuning:")
-    print(f"   ├─ 性能对比: {acc_diff:+.2f}% (LoRA {'更优' if acc_diff > 0 else '稍逊'})")
-    print(f"   ├─ 参数减少: {param_reduction:.1f}%")
-    print(f"   ├─ LoRA参数: {lora_best['Trainable Params (M)']:.2f}M")
-    print(f"   └─ Full参数: {full['Trainable Params (M)']:.2f}M")
+    print(f"\n⚡ Best LoRA vs Full Fine-tuning:")
+    print(f"   ├─ Performance Difference: {acc_diff:+.2f}% (LoRA {'better' if acc_diff > 0 else 'slightly worse'})")
+    print(f"   ├─ Parameter Reduction: {param_reduction:.1f}%")
+    print(f"   ├─ LoRA Parameters: {lora_best['Trainable Params (M)']:.2f}M")
+    print(f"   └─ Full Parameters: {full['Trainable Params (M)']:.2f}M")
     
-    # LoRA rank影响
+    # LoRA rank impact
     lora_df = df[df['Type'] == 'LoRA'].sort_values('LoRA Rank')
-    print(f"\n📈 LoRA Rank 影响分析:")
+    print(f"\n📈 LoRA Rank Impact Analysis:")
     for _, row in lora_df.iterrows():
         rank = row['LoRA Rank']
         acc = row['Accuracy']
         params = row['Trainable Params (M)']
-        print(f"   ├─ r={rank:2}: 准确率={acc:.4f}, 参数={params:.2f}M")
+        print(f"   ├─ r={rank:2}: Accuracy={acc:.4f}, Parameters={params:.2f}M")
     
-    # 分析趋势
+    # Analyze trend
     ranks = lora_df['LoRA Rank'].astype(int).tolist()
     accs = lora_df['Accuracy'].tolist()
     if accs[-1] > accs[0]:
-        trend = "整体上升"
+        trend = "overall upward"
     else:
-        trend = "波动"
-    print(f"   └─ 趋势: Rank从{ranks[0]}到{ranks[-1]}，性能{trend}")
+        trend = "fluctuating"
+    print(f"   └─ Trend: Rank from {ranks[0]} to {ranks[-1]}, performance {trend}")
     
-    # 效率分析
+    # Efficiency analysis
     efficiency = df['F1 Score'] / (df['Trainable Params (M)'] / 100)
     best_eff_idx = efficiency.idxmax()
     best_eff = df.loc[best_eff_idx]
     
-    print(f"\n💡 参数效率最优: {best_eff['Method']}")
-    print(f"   └─ 效率得分: {efficiency[best_eff_idx]:.2f} (F1 per 100M params)")
+    print(f"\n💡 Most Parameter-Efficient: {best_eff['Method']}")
+    print(f"   └─ Efficiency Score: {efficiency[best_eff_idx]:.2f} (F1 per 100M params)")
 
 def main():
     print("="*70)
-    print("最终实验结果综合分析")
+    print("Final Experiment Results Comprehensive Analysis")
     print("="*70)
     
-    # 确保plots目录存在
+    # Ensure plots directory exists
     os.makedirs('plots', exist_ok=True)
     
-    # 加载结果
+    # Load results
     results = load_final_results()
     
     if not results:
-        print("\n✗ 未找到结果文件")
+        print("\n✗ No result files found")
         return
     
-    print(f"\n✓ 成功加载 {len(results)} 个实验结果\n")
+    print(f"\n✓ Successfully loaded {len(results)} experiment results\n")
     
-    # 创建对比表
+    # Create comparison table
     df = create_comparison_table(results)
     
-    # 保存CSV
+    # Save CSV
     df.to_csv('results/final_comparison.csv', index=False)
-    print("✓ 对比表已保存: results/final_comparison.csv")
+    print("✓ Comparison table saved: results/final_comparison.csv")
     
-    # 打印表格
+    # Print table
     print("\n" + "="*70)
-    print("详细对比表")
+    print("Detailed Comparison Table")
     print("="*70)
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
     print(df.to_string(index=False))
     
-    # 生成可视化（每张图单独保存）
+    # Generate visualizations (each plot saved separately)
     print("\n" + "="*70)
-    print("生成可视化图表...")
+    print("Generating visualization plots...")
     print("="*70)
     
     plot_performance_comparison(df)
@@ -399,22 +399,22 @@ def main():
     plot_metrics_heatmap(df)
     plot_full_vs_best_lora(df)
     
-    # 打印洞察
+    # Print insights
     print_insights(df)
     
     print("\n" + "="*70)
-    print("✅ 分析完成!")
+    print("Analysis complete!")
     print("="*70)
-    print("\n生成的文件:")
-    print("  📄 results/final_comparison.csv")
-    print("  📊 plots/1_performance_comparison.png")
-    print("  📊 plots/2_lora_rank_impact.png")
-    print("  📊 plots/3_parameter_comparison.png")
-    print("  📊 plots/4_training_time.png")
-    print("  📊 plots/5_parameter_efficiency.png")
-    print("  📊 plots/6_accuracy_vs_parameters.png")
-    print("  📊 plots/7_metrics_heatmap.png")
-    print("  📊 plots/8_full_vs_best_lora.png")
+    print("\nGenerated files:")
+    print("  results/final_comparison.csv")
+    print("  plots/1_performance_comparison.png")
+    print("  plots/2_lora_rank_impact.png")
+    print("  plots/3_parameter_comparison.png")
+    print("  plots/4_training_time.png")
+    print("  plots/5_parameter_efficiency.png")
+    print("  plots/6_accuracy_vs_parameters.png")
+    print("  plots/7_metrics_heatmap.png")
+    print("  Plots/8_full_vs_best_lora.png")
     print("="*70)
 
 if __name__ == "__main__":
