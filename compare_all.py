@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def load_results():
-    """加载所有实验结果"""
+    """load all the results"""
     results = {}
-    
-    # 基础实验
+
     try:
         with open("results/lora/metrics.json") as f:
             results['LoRA (3 epochs)'] = json.load(f)
@@ -41,8 +40,7 @@ def main():
     if not results:
         print("✗ 没有找到结果文件")
         return
-    
-    # 创建对比表格
+
     data = []
     for name, result in results.items():
         data.append({
@@ -56,15 +54,12 @@ def main():
     df = pd.DataFrame(data)
     df = df.sort_values('Accuracy', ascending=False)
     
-    # 保存CSV
     df.to_csv('results/comparison_all.csv', index=False)
     print("\n" + df.to_string(index=False))
     print(f"\n✓ 已保存到: results/comparison_all.csv")
     
-    # 生成可视化
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    
-    # 1. 性能对比
+
     ax = axes[0, 0]
     x = range(len(df))
     width = 0.35
@@ -76,8 +71,7 @@ def main():
     ax.set_xticklabels(df['Method'], rotation=45, ha='right')
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
-    
-    # 2. 训练时间
+
     ax = axes[0, 1]
     bars = ax.barh(df['Method'], df['Training Time (min)'])
     ax.set_xlabel('Time (minutes)')
@@ -86,8 +80,7 @@ def main():
         width = bar.get_width()
         ax.text(width, bar.get_y() + bar.get_height()/2, 
                 f'{width:.1f}min', ha='left', va='center')
-    
-    # 3. 参数效率
+        
     ax = axes[1, 0]
     efficiency = df['F1 Score'] / (df['Trainable Params (M)'] / 10)
     bars = ax.bar(range(len(df)), efficiency)
@@ -96,7 +89,6 @@ def main():
     ax.set_xticks(range(len(df)))
     ax.set_xticklabels(df['Method'], rotation=45, ha='right')
     
-    # 4. Accuracy vs Training Time
     ax = axes[1, 1]
     colors = ['#ff6b6b', '#4ecdc4', '#ff6b6b', '#4ecdc4']
     ax.scatter(df['Training Time (min)'], df['Accuracy'], 
