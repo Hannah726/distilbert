@@ -26,6 +26,7 @@ pip install -r requirements.txt
 
 ### Training
 ```bash
+# Note that the script has many modes and may be a bit vague, but it is important to note that the terminals here are for reference only.
 # Train with LoRA (faster, fewer parameters)
 python train_lora.py
 
@@ -37,18 +38,16 @@ python compare.py
 ```
 
 ## 📈 Results
-
-| Method | Accuracy | F1 Score | Trainable Params | Training Time |
-|--------|----------|----------|------------------|---------------|
-| Full Fine-tuning | ~92% | ~91% | 66M | ~18 min |
-| LoRA (r=8) | ~91% | ~90% | 1.8M | ~12 min |
+To be shown in the report "4213.pdf".
 
 **Key Findings**:
-- LoRA achieves comparable performance with **97% fewer trainable parameters**
-- Training time reduced by **~33%**
-- Excellent parameter efficiency for domain-specific tasks
+- LoRA achieves comparable performance with **98% fewer trainable parameters**
+- Training time is not reduced, somehow contrary to our intuition
+- Excellent parameter efficiency for financial tasks
 
 ## 📁 Project Structure
+Just part of the structure...
+The script train_final_comparison.py is the one train enough epochs for comparison the LoRA with 8, 16, 32 and FT.
 ```
 .
 ├── train_full.py          # Full fine-tuning script
@@ -63,6 +62,7 @@ python compare.py
 │       └── metrics.json
 └── plots/
     └── comparison.png
+...
 ```
 
 ## 🔬 Methodology
@@ -84,12 +84,6 @@ python compare.py
 - **Precision & Recall**: Per-class performance
 - **Training Time**: Wall-clock time per epoch
 - **Parameter Efficiency**: Performance per million parameters
-
-## 🎓 References
-
-- Hu et al. (2021). "LoRA: Low-Rank Adaptation of Large Language Models"
-- Financial PhraseBank: Malo et al. (2014)
-- Hugging Face PEFT Library
 
 ## 📝 License
 
