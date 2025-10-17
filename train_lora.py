@@ -21,28 +21,28 @@ def main():
     
     start_time = time.time()
     
-    # 1. 加载数据集
+    # 1. Load dataset
     print("\n[1/6] Loading dataset...")
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     print(f"✓ Dataset loaded successfully!")
     print(dataset)
     
-    print("\n数据样本:")
+    print("\nData sample:")
     print(dataset['train'][0])
     
-    # 使用验证集作为评估集
+    # Use validation set as evaluation set
     train_dataset = dataset['train']
     eval_dataset = dataset['validation'] if 'validation' in dataset else dataset['test']
     
     print(f"Train samples: {len(train_dataset)}")
     print(f"Eval samples: {len(eval_dataset)}")
     
-    # 2. 加载tokenizer和模型
+    # 2. Load tokenizer and model
     print("\n[2/6] Loading model and tokenizer...")
     model_name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
-    # 数据预处理
+    # Data preprocessing
     def tokenize_function(examples):
         return tokenizer(examples["sentence"], padding="max_length", 
                         truncation=True, max_length=128)
@@ -51,13 +51,13 @@ def main():
     tokenized_train = train_dataset.map(tokenize_function, batched=True)
     tokenized_eval = eval_dataset.map(tokenize_function, batched=True)
     
-    # 加载基础模型
+    # Load base model
     model = AutoModelForSequenceClassification.from_pretrained(
         model_name, 
         num_labels=3
     )
     
-    # 3. 配置LoRA
+    # 3. Configure LoRA
     print("\n[3/6] Configuring LoRA...")
     lora_config = LoraConfig(
         task_type=TaskType.SEQ_CLS,
@@ -75,7 +75,7 @@ def main():
     print(f"Trainable parameters: {param_stats['trainable']:,}")
     print(f"Trainable %: {param_stats['trainable_percent']:.2f}%")
     
-    # 4. 训练配置
+    # 4. Training setup
     print("\n[4/6] Setting up training...")
     training_args = TrainingArguments(
         output_dir="./results/lora",
@@ -86,7 +86,7 @@ def main():
         weight_decay=0.01,
         logging_dir="./logs/lora",
         logging_steps=50,
-        eval_strategy="epoch",  # 修复：evaluation_strategy -> eval_strategy
+        eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="f1",
@@ -106,11 +106,11 @@ def main():
         compute_metrics=compute_metrics,
     )
     
-    # 5. 训练
+    # 5. Training
     print("\n[5/6] Training...")
     train_result = trainer.train()
     
-    # 6. 评估
+    # 6. Evaluation
     print("\n[6/6] Evaluating...")
     eval_results = trainer.evaluate()
     
