@@ -15,19 +15,19 @@ from peft import get_peft_model, LoraConfig, TaskType
 from utils import compute_metrics, count_parameters, save_results
 
 def train_model(config_name, use_lora=False, lora_rank=None):
-    """统一的训练函数"""
+    """Unified training function"""
     print("\n" + "="*70)
     print(f"Training: {config_name}")
     print("="*70)
     
     start_time = time.time()
     
-    # 加载数据
+    # Load dataset
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     train_dataset = dataset['train']
     eval_dataset = dataset['validation']
     
-    # 加载模型
+    # Load model
     model_name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
@@ -42,7 +42,7 @@ def train_model(config_name, use_lora=False, lora_rank=None):
         model_name, num_labels=3
     )
     
-    # 配置LoRA（如果需要）
+    # Configure LoRA (if required)
     if use_lora:
         lora_config = LoraConfig(
             task_type=TaskType.SEQ_CLS,
@@ -56,12 +56,12 @@ def train_model(config_name, use_lora=False, lora_rank=None):
     
     param_stats = count_parameters(model)
     
-    # 统一训练配置
+    # Unified training configuration
     output_dir = f"./results/{config_name}"
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=20,  # 统一20 epochs
-        per_device_train_batch_size=4,  # 小batch延长时间
+        num_train_epochs=20,  # Unified 20 epochs
+        per_device_train_batch_size=4,  # Small batch to extend training time
         per_device_eval_batch_size=16,
         warmup_steps=200,
         weight_decay=0.01,
@@ -86,11 +86,11 @@ def train_model(config_name, use_lora=False, lora_rank=None):
         compute_metrics=compute_metrics,
     )
     
-    # 训练
-    print(f"\n开始训练 (20 epochs, batch_size=4)...")
+    # Start training
+    print(f"\nStarting training (20 epochs, batch_size=4)...")
     trainer.train()
     
-    # 评估
+    # Evaluate
     eval_results = trainer.evaluate()
     training_time = time.time() - start_time
     
@@ -109,15 +109,15 @@ def train_model(config_name, use_lora=False, lora_rank=None):
     save_results(results, f"{output_dir}/metrics.json")
     trainer.save_model(f"{output_dir}/best_model")
     
-    print(f"\n✓ {config_name} 完成!")
-    print(f"  时间: {training_time/60:.2f} 分钟")
-    print(f"  准确率: {eval_results['eval_accuracy']:.4f}")
+    print(f"\n✓ {config_name} completed!")
+    print(f"  Time: {training_time/60:.2f} minutes")
+    print(f"  Accuracy: {eval_results['eval_accuracy']:.4f}")
     print(f"  F1: {eval_results['eval_f1']:.4f}")
     
     return results
 
 def main():
-    """运行完整的标准化实验"""
+    """Run complete standardized experiments"""
     print("\n" + "="*70)
     print("Final Standardized Experiments")
     print("Configuration: 20 epochs, batch_size=4, DistilBERT")
@@ -126,7 +126,7 @@ def main():
     total_start = time.time()
     all_results = []
     
-    # 实验配置
+    # Experiment configurations
     experiments = [
         ("full_final", False, None),
         ("lora_r8_final", True, 8),
@@ -136,27 +136,27 @@ def main():
     
     for i, (name, use_lora, rank) in enumerate(experiments, 1):
         print(f"\n{'>'*70}")
-        print(f"实验 {i}/{len(experiments)}")
+        print(f"Experiment {i}/{len(experiments)}")
         print(f"{'>'*70}")
         
         result = train_model(name, use_lora, rank)
         all_results.append(result)
         
         elapsed = (time.time() - total_start) / 60
-        print(f"\n已用时间: {elapsed:.1f} 分钟")
+        print(f"\nElapsed time: {elapsed:.1f} minutes")
     
-    # 保存汇总
+    # Save summary
     import json
     with open("./results/final_comparison_summary.json", 'w') as f:
         json.dump(all_results, f, indent=4)
     
     total_time = (time.time() - total_start) / 60
     
-    # 打印汇总
+    # Print summary
     print("\n" + "="*70)
-    print("实验汇总")
+    print("Experiment Summary")
     print("="*70)
-    print(f"\n{'实验':<20} {'Rank':<8} {'准确率':<12} {'F1':<12} {'时间(分钟)':<12}")
+    print(f"\n{'Experiment':<20} {'Rank':<8} {'Accuracy':<12} {'F1':<12} {'Time (min)':<12}")
     print("-"*70)
     for r in all_results:
         name = r['experiment']
@@ -167,7 +167,7 @@ def main():
         print(f"{name:<20} {str(rank):<8} {acc:<12.4f} {f1:<12.4f} {time_min:<12.2f}")
     
     print("-"*70)
-    print(f"总时间: {total_time:.2f} 分钟 ({total_time/60:.2f} 小时)")
+    print(f"Total time: {total_time:.2f} minutes ({total_time/60:.2f} hours)")
     print("="*70)
 
 if __name__ == "__main__":
