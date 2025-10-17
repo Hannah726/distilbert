@@ -8,14 +8,14 @@ def main():
     print("Generating Comparison Analysis")
     print("="*50)
     
-    # 读取结果
+    # read
     with open("./results/full/metrics.json", "r") as f:
         full_results = json.load(f)
     
     with open("./results/lora/metrics.json", "r") as f:
         lora_results = json.load(f)
     
-    # 创建对比表格
+    # csv
     comparison_data = {
         "Method": ["Full Fine-tuning", "LoRA (r=8)"],
         "Accuracy": [
@@ -46,15 +46,15 @@ def main():
     
     df = pd.DataFrame(comparison_data)
     
-    # 保存为CSV
+    # save
     df.to_csv("./results/comparison.csv", index=False)
     print("\nComparison table saved to ./results/comparison.csv")
     print("\n" + df.to_string(index=False))
     
-    # 生成可视化
+    # visualization
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     
-    # 1. 性能对比
+    # 1. performance
     metrics = ["Accuracy", "F1 Score", "Precision", "Recall"]
     x = range(len(df))
     width = 0.35
@@ -71,7 +71,7 @@ def main():
     ax1.set_ylim([0.8, 1.0])
     ax1.grid(axis='y', alpha=0.3)
     
-    # 2. 参数量对比
+    # 2. number of parameters
     ax2 = axes[0, 1]
     bars = ax2.bar(df["Method"], df["Trainable Params (M)"], color=['#ff6b6b', '#4ecdc4'])
     ax2.set_ylabel('Parameters (Millions)')
@@ -83,7 +83,7 @@ def main():
         ax2.text(bar.get_x() + bar.get_width()/2., height,
                 f'{height:.1f}M', ha='center', va='bottom')
     
-    # 3. 训练时间对比
+    # 3. training time
     ax3 = axes[1, 0]
     bars = ax3.bar(df["Method"], df["Training Time (min)"], color=['#ff6b6b', '#4ecdc4'])
     ax3.set_ylabel('Time (minutes)')
@@ -95,7 +95,7 @@ def main():
         ax3.text(bar.get_x() + bar.get_width()/2., height,
                 f'{height:.1f}min', ha='center', va='bottom')
     
-    # 4. 效率得分（F1/参数量）
+    # 4. efficiency
     ax4 = axes[1, 1]
     efficiency = df["F1 Score"] / (df["Trainable Params (M)"] / 100)
     bars = ax4.bar(df["Method"], efficiency, color=['#ff6b6b', '#4ecdc4'])
@@ -112,7 +112,7 @@ def main():
     plt.savefig("./plots/comparison.png", dpi=300, bbox_inches='tight')
     print("\nComparison plot saved to ./plots/comparison.png")
     
-    # 生成总结
+    # conclusion
     print("\n" + "="*50)
     print("KEY FINDINGS:")
     print("="*50)
