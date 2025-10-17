@@ -20,7 +20,7 @@ def main():
     
     start_time = time.time()
     
-    # 1. 加载数据集
+    # 1. Load dataset
     print("\n[1/5] Loading dataset...")
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     
@@ -30,7 +30,7 @@ def main():
     print(f"Train samples: {len(train_dataset)}")
     print(f"Eval samples: {len(eval_dataset)}")
     
-    # 2. 使用BERT-base
+    # 2. Use BERT-base
     print("\n[2/5] Loading BERT-base model...")
     model_name = "bert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -52,12 +52,12 @@ def main():
     print(f"\nTotal parameters: {param_stats['total']:,}")
     print(f"Trainable parameters: {param_stats['trainable']:,}")
     
-    # 3. 训练配置
+    # 3. Training setup
     print("\n[3/5] Setting up training...")
     training_args = TrainingArguments(
         output_dir="./results/full_advanced",
-        num_train_epochs=10,  # 增加到10
-        per_device_train_batch_size=8,  # 减小batch
+        num_train_epochs=10,  # Increased to 10
+        per_device_train_batch_size=8,  # Smaller batch
         per_device_eval_batch_size=16,
         warmup_steps=200,
         weight_decay=0.01,
@@ -84,11 +84,11 @@ def main():
         compute_metrics=compute_metrics,
     )
     
-    # 4. 训练
+    # 4. Training
     print("\n[4/5] Training...")
     train_result = trainer.train()
     
-    # 5. 评估
+    # 5. Evaluation
     print("\n[5/5] Evaluating...")
     eval_results = trainer.evaluate()
     
