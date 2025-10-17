@@ -1,6 +1,4 @@
-"""
-评估训练好的模型
-"""
+# Evaluate the trained model
 import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -12,23 +10,23 @@ import os
 
 def evaluate_model(model_path, model_type="full"):
     """
-    评估模型
+    Evaluate the model.
     Args:
-        model_path: 模型路径
-        model_type: "full" 或 "lora"
+        model_path: Path to the model.
+        model_type: "full" or "lora".
     """
     print(f"\n{'='*50}")
     print(f"Evaluating {model_type.upper()} model")
     print(f"{'='*50}\n")
     
-    # 加载数据
+    # Load data
     print("[1/4] Loading dataset...")
     try:
         dataset = load_dataset('financial_phrasebank', 'sentences_allagree')
         dataset = dataset["train"].train_test_split(test_size=0.2, seed=42)
         test_dataset = dataset["test"]
     except:
-        # 如果HuggingFace失败，使用本地CSV
+        # If HuggingFace fails, fall back to local CSV
         import pandas as pd
         df = pd.read_csv('data/financial_phrasebank.csv')
         from sklearn.model_selection import train_test_split
@@ -37,11 +35,11 @@ def evaluate_model(model_path, model_type="full"):
     
     print(f"Test samples: {len(test_dataset)}")
     
-    # 加载tokenizer
+    # Load tokenizer
     print("\n[2/4] Loading tokenizer and model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     
-    # 加载模型
+    # Load model
     if model_type == "lora":
         base_model = AutoModelForSequenceClassification.from_pretrained(
             "distilbert-base-uncased", num_labels=3
@@ -54,7 +52,7 @@ def evaluate_model(model_path, model_type="full"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     
-    # 预测
+    # Inference
     print("\n[3/4] Making predictions...")
     predictions = []
     true_labels = []
@@ -78,7 +76,7 @@ def evaluate_model(model_path, model_type="full"):
         predictions.append(pred)
         true_labels.append(label)
     
-    # 计算指标
+    # Compute metrics
     print("\n[4/4] Computing metrics...")
     from sklearn.metrics import classification_report, accuracy_score, f1_score
     
@@ -93,14 +91,14 @@ def evaluate_model(model_path, model_type="full"):
     print("\n" + classification_report(true_labels, predictions, 
                                        target_names=['Positive', 'Neutral', 'Negative']))
     
-    # 绘制混淆矩阵
+    # Plot confusion matrix
     plot_confusion_matrix(
         true_labels, predictions,
         labels=['Positive', 'Neutral', 'Negative'],
         save_path=f'plots/confusion_matrix_{model_type}.png'
     )
     
-    # 保存结果
+    # Save results
     results = {
         'accuracy': float(accuracy),
         'f1_score': float(f1),
