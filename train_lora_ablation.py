@@ -15,23 +15,23 @@ from peft import get_peft_model, LoraConfig, TaskType
 from utils import compute_metrics, count_parameters, save_results
 
 def train_lora_with_config(rank, alpha, epochs, experiment_name):
-    """使用指定配置训练LoRA"""
+    """Train LoRA with specified configuration"""
     print("\n" + "="*60)
-    print(f"实验: {experiment_name}")
+    print(f"Experiment: {experiment_name}")
     print(f"LoRA rank={rank}, alpha={alpha}, epochs={epochs}")
     print("="*60)
     
     start_time = time.time()
     
-    # 加载数据
+    # Load dataset
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     train_dataset = dataset['train']
     eval_dataset = dataset['validation']
     
-    print(f"训练样本: {len(train_dataset)}")
-    print(f"验证样本: {len(eval_dataset)}")
+    print(f"Training samples: {len(train_dataset)}")
+    print(f"Validation samples: {len(eval_dataset)}")
     
-    # 加载模型
+    # Load model
     model_name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
@@ -39,7 +39,7 @@ def train_lora_with_config(rank, alpha, epochs, experiment_name):
         return tokenizer(examples["sentence"], padding="max_length", 
                         truncation=True, max_length=128)
     
-    print("预处理数据...")
+    print("Preprocessing data...")
     tokenized_train = train_dataset.map(tokenize_function, batched=True)
     tokenized_eval = eval_dataset.map(tokenize_function, batched=True)
     
@@ -47,8 +47,8 @@ def train_lora_with_config(rank, alpha, epochs, experiment_name):
         model_name, num_labels=3
     )
     
-    # 配置LoRA
-    print(f"配置 LoRA (r={rank}, alpha={alpha})...")
+    # Configure LoRA
+    print(f"Configuring LoRA (r={rank}, alpha={alpha})...")
     lora_config = LoraConfig(
         task_type=TaskType.SEQ_CLS,
         r=rank,
@@ -61,7 +61,7 @@ def train_lora_with_config(rank, alpha, epochs, experiment_name):
     model.print_trainable_parameters()
     param_stats = count_parameters(model)
     
-    # 训练配置
+    # Training configuration
     output_dir = f"./results/{experiment_name}"
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -91,12 +91,12 @@ def train_lora_with_config(rank, alpha, epochs, experiment_name):
         compute_metrics=compute_metrics,
     )
     
-    # 训练
-    print(f"\n开始训练 ({epochs} epochs)...")
+    # Training
+    print(f"\nStarting training ({epochs} epochs)...")
     trainer.train()
     
-    # 评估
-    print("评估模型...")
+    # Evaluation
+    print("Evaluating model...")
     eval_results = trainer.evaluate()
     
     training_time = time.time() - start_time
@@ -116,22 +116,22 @@ def train_lora_with_config(rank, alpha, epochs, experiment_name):
     save_results(results, f"{output_dir}/metrics.json")
     
     print("\n" + "-"*60)
-    print(f"✓ {experiment_name} 完成!")
-    print(f"  训练时间: {training_time/60:.2f} 分钟")
-    print(f"  准确率: {eval_results['eval_accuracy']:.4f}")
-    print(f"  F1分数: {eval_results['eval_f1']:.4f}")
+    print(f"✓ {experiment_name} completed!")
+    print(f"  Training time: {training_time/60:.2f} minutes")
+    print(f"  Accuracy: {eval_results['eval_accuracy']:.4f}")
+    print(f"  F1 Score: {eval_results['eval_f1']:.4f}")
     print("-"*60)
     
     return results
 
 def main():
     print("\n" + "="*60)
-    print("LoRA 消融实验 - 测试不同rank和epochs的影响")
+    print("LoRA Ablation Experiments - Testing Effects of Different Ranks and Epochs")
     print("="*60)
     
     all_results = []
     
-    # 实验组合
+    # Experiment combinations
     experiments = [
         # (rank, alpha, epochs, name)
         (4, 8, 8, "lora_r4_e8"),
@@ -146,22 +146,22 @@ def main():
         result = train_lora_with_config(rank, alpha, epochs, name)
         all_results.append(result)
         
-        # 显示当前总进度
+        # Show current overall progress
         elapsed = (time.time() - total_start) / 60
-        print(f"\n已用时间: {elapsed:.1f} 分钟\n")
+        print(f"\nElapsed time: {elapsed:.1f} minutes\n")
     
-    # 保存汇总
+    # Save summary
     import json
     with open("./results/lora_ablation_summary.json", 'w') as f:
         json.dump(all_results, f, indent=4)
     
     total_time = (time.time() - total_start) / 60
     
-    # 打印汇总表格
+    # Print summary table
     print("\n" + "="*60)
-    print("实验汇总")
+    print("Experiment Summary")
     print("="*60)
-    print(f"\n{'实验':<15} {'Rank':<6} {'Epochs':<7} {'准确率':<10} {'F1分数':<10} {'时间(分钟)':<12}")
+    print(f"\n{'Experiment':<15} {'Rank':<6} {'Epochs':<7} {'Accuracy':<10} {'F1 Score':<10} {'Time (min)':<12}")
     print("-"*60)
     for r in all_results:
         exp_name = r['experiment'].replace('lora_', '')
@@ -173,7 +173,7 @@ def main():
         print(f"{exp_name:<15} {rank:<6} {epochs:<7} {acc:<10.4f} {f1:<10.4f} {time_min:<12.2f}")
     
     print("-"*60)
-    print(f"总训练时间: {total_time:.2f} 分钟")
+    print(f"Total training time: {total_time:.2f} minutes")
     print("="*60)
 
 if __name__ == "__main__":
