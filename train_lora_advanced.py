@@ -21,7 +21,7 @@ def main():
     
     start_time = time.time()
     
-    # 1. 加载数据集
+    # 1. Load dataset
     print("\n[1/6] Loading dataset...")
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     
@@ -31,9 +31,9 @@ def main():
     print(f"Train samples: {len(train_dataset)}")
     print(f"Eval samples: {len(eval_dataset)}")
     
-    # 2. 使用更大的模型：BERT-base 而不是 DistilBERT
+    # 2. Use a larger model: BERT-base instead of DistilBERT
     print("\n[2/6] Loading BERT-base model...")
-    model_name = "bert-base-uncased"  # 更大：110M vs 67M
+    model_name = "bert-base-uncased"  # Larger: 110M vs 67M
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
     def tokenize_function(examples):
@@ -49,14 +49,14 @@ def main():
         num_labels=3
     )
     
-    # 3. 配置更复杂的LoRA
+    # 3. Configure more complex LoRA
     print("\n[3/6] Configuring LoRA...")
     lora_config = LoraConfig(
         task_type=TaskType.SEQ_CLS,
-        r=16,  # 从8增加到16
-        lora_alpha=32,  # 从16增加到32
+        r=16,  # Increased from 8 to 16
+        lora_alpha=32,  # Increased from 16 to 32
         lora_dropout=0.1,
-        target_modules=["query", "key", "value", "dense"]  # 更多层
+        target_modules=["query", "key", "value", "dense"]  # More layers
     )
     
     model = get_peft_model(model, lora_config)
@@ -64,12 +64,12 @@ def main():
     
     param_stats = count_parameters(model)
     
-    # 4. 更长的训练配置
+    # 4. Longer training setup
     print("\n[4/6] Setting up training...")
     training_args = TrainingArguments(
         output_dir="./results/lora_advanced",
-        num_train_epochs=10,  # 从3增加到10
-        per_device_train_batch_size=8,  # 减小batch提高训练时间
+        num_train_epochs=10,  # Increased from 3 to 10
+        per_device_train_batch_size=8,  # Smaller batch to increase training time
         per_device_eval_batch_size=16,
         warmup_steps=200,
         weight_decay=0.01,
@@ -96,11 +96,11 @@ def main():
         compute_metrics=compute_metrics,
     )
     
-    # 5. 训练
+    # 5. Training
     print("\n[5/6] Training...")
     train_result = trainer.train()
     
-    # 6. 评估
+    # 6. Evaluation
     print("\n[6/6] Evaluating...")
     eval_results = trainer.evaluate()
     
