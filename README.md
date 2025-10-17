@@ -26,7 +26,8 @@ pip install -r requirements.txt
 
 ### Training
 ```bash
-# Note that the script has many modes and may be a bit vague, but it is important to note that the terminals here are for reference only.
+# Note that the script has many modes and may be a bit vague,
+# but it is important to note that the terminals here are for reference only.
 # Train with LoRA (faster, fewer parameters)
 python train_lora.py
 
@@ -46,7 +47,7 @@ To be shown in the report "4213.pdf".
 - Excellent parameter efficiency for financial tasks
 
 ## 📁 Project Structure
-Just part of the structure...
+Just part of the structure...        
 The script train_final_comparison.py is the one train enough epochs for comparison the LoRA with 8, 16, 32 and FT.
 ```
 .
