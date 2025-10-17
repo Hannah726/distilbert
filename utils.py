@@ -1,13 +1,13 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
 import matplotlib
-matplotlib.use('Agg')  # 使用非交互式后端
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
 def compute_metrics(pred):
-    """计算评估指标"""
+    """Compute evaluation metrics"""
     labels = pred.label_ids
     preds = pred.predictions.argmax(-1)
     
@@ -24,7 +24,7 @@ def compute_metrics(pred):
     }
 
 def plot_confusion_matrix(y_true, y_pred, labels, save_path):
-    """绘制混淆矩阵"""
+    """Plot confusion matrix"""
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
@@ -38,13 +38,13 @@ def plot_confusion_matrix(y_true, y_pred, labels, save_path):
     print(f"Confusion matrix saved to {save_path}")
 
 def save_results(results, save_path):
-    """保存结果到JSON"""
+    """Save results to JSON"""
     with open(save_path, 'w') as f:
         json.dump(results, f, indent=4)
     print(f"Results saved to {save_path}")
 
 def count_parameters(model):
-    """统计模型参数"""
+    """Count model parameters"""
     total = sum(p.numel() for p in model.parameters())
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     return {
