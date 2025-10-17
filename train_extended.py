@@ -22,7 +22,7 @@ def train_lora_extended():
     
     start_time = time.time()
     
-    # 加载数据
+    # data loading
     print("\n[1/6] Loading dataset...")
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     train_dataset = dataset['train']
@@ -31,7 +31,7 @@ def train_lora_extended():
     print(f"Train samples: {len(train_dataset)}")
     print(f"Eval samples: {len(eval_dataset)}")
     
-    # 加载模型
+    # model loading
     print("\n[2/6] Loading model and tokenizer...")
     model_name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -48,7 +48,7 @@ def train_lora_extended():
         model_name, num_labels=3
     )
     
-    # 配置LoRA
+    # set for LoRA
     print("\n[3/6] Configuring LoRA...")
     lora_config = LoraConfig(
         task_type=TaskType.SEQ_CLS,
@@ -62,12 +62,12 @@ def train_lora_extended():
     model.print_trainable_parameters()
     param_stats = count_parameters(model)
     
-    # 训练配置
+    # train settings
     print("\n[4/6] Setting up training...")
     training_args = TrainingArguments(
         output_dir="./results/lora_extended",
-        num_train_epochs=15,  # 15 epochs
-        per_device_train_batch_size=8,  # 减小batch提高训练时间
+        num_train_epochs=15,
+        per_device_train_batch_size=8, 
         per_device_eval_batch_size=32,
         warmup_steps=150,
         weight_decay=0.01,
@@ -92,11 +92,11 @@ def train_lora_extended():
         compute_metrics=compute_metrics,
     )
     
-    # 训练
+    # train
     print("\n[5/6] Training...")
     trainer.train()
     
-    # 评估
+    # eva
     print("\n[6/6] Evaluating...")
     eval_results = trainer.evaluate()
     
@@ -134,7 +134,7 @@ def train_full_extended():
     
     start_time = time.time()
     
-    # 加载数据
+    # data loading
     print("\n[1/5] Loading dataset...")
     dataset = load_dataset("lmassaron/FinancialPhraseBank")
     train_dataset = dataset['train']
@@ -143,7 +143,7 @@ def train_full_extended():
     print(f"Train samples: {len(train_dataset)}")
     print(f"Eval samples: {len(eval_dataset)}")
     
-    # 加载模型
+    # model loading
     print("\n[2/5] Loading model and tokenizer...")
     model_name = "distilbert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -164,12 +164,12 @@ def train_full_extended():
     print(f"\nTotal parameters: {param_stats['total']:,}")
     print(f"Trainable parameters: {param_stats['trainable']:,}")
     
-    # 训练配置
+    # train settings
     print("\n[3/5] Setting up training...")
     training_args = TrainingArguments(
         output_dir="./results/full_extended",
-        num_train_epochs=15,  # 15 epochs
-        per_device_train_batch_size=8,  # 减小batch
+        num_train_epochs=15,
+        per_device_train_batch_size=8,
         per_device_eval_batch_size=32,
         warmup_steps=150,
         weight_decay=0.01,
@@ -194,11 +194,11 @@ def train_full_extended():
         compute_metrics=compute_metrics,
     )
     
-    # 训练
+    # train
     print("\n[4/5] Training...")
     trainer.train()
     
-    # 评估
+    # eva
     print("\n[5/5] Evaluating...")
     eval_results = trainer.evaluate()
     
@@ -237,19 +237,19 @@ def main():
     
     total_start = time.time()
     
-    # 训练 LoRA Extended
+    # LoRA Extended
     print("\n" + ">"*60)
     print("EXPERIMENT 1/2: LoRA Extended")
     print(">"*60)
     lora_results = train_lora_extended()
     
-    # 训练 Full Extended
+    # Full Extended
     print("\n" + ">"*60)
     print("EXPERIMENT 2/2: Full Fine-tuning Extended")
     print(">"*60)
     full_results = train_full_extended()
     
-    # 总结
+    # conclusion
     total_time = (time.time() - total_start) / 60
     
     print("\n" + "="*60)
@@ -266,7 +266,7 @@ def main():
           f"{full_results['metrics']['eval_f1']:<12.4f} {full_results['training_time_minutes']:<12.2f}")
     print("-"*60)
     
-    # 保存综合结果
+    # save
     import json
     summary = {
         "lora_extended": lora_results,
